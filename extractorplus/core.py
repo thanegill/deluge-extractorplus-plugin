@@ -121,9 +121,6 @@ class Core(CorePluginBase):
         self.config = deluge.configmanager.ConfigManager(
             'extractorplus.conf', DEFAULT_PREFS
         )
-        self.check_thread = RepeatedTimer(60.0 * 60.0, self.check_cleanup)
-        if self.config['auto_cleanup']:
-            self.check_thread.start()
         self.extract_lock = Lock()
         self.extract_pool = None
 
