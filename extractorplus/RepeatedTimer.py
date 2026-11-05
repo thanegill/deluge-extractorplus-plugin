@@ -20,12 +20,15 @@ class RepeatedTimer(object):
         self.args = args
         self.kwargs = kwargs
         self.is_running = False
+        self._generation = 0
         self._lock = RLock()
         self.start()
 
-    def _run(self):
+    def _run(self, generation):
         """Internal method to run the timer and execute the function."""
         with self._lock:
+            if generation != self._generation:
+                return
             self.is_running = False
             self.start()
         self.function(*self.args, **self.kwargs)
@@ -34,7 +37,8 @@ class RepeatedTimer(object):
         """Start the timer if it's not already running."""
         with self._lock:
             if not self.is_running:
-                self._timer = Timer(self.interval, self._run)
+                self._generation += 1
+                self._timer = Timer(self.interval, self._run, args=(self._generation,))
                 self._timer.daemon = True  # Make timer daemon to exit with main thread
                 self._timer.start()
                 self.is_running = True
@@ -45,3 +49,4 @@ class RepeatedTimer(object):
             if self._timer is not None:
                 self._timer.cancel()
                 self.is_running = False
+                self._generation += 1
