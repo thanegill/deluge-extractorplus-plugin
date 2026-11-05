@@ -1,4 +1,4 @@
-from threading import Timer, Lock
+from threading import Timer, RLock
 
 
 class RepeatedTimer(object):
@@ -20,7 +20,7 @@ class RepeatedTimer(object):
         self.args = args
         self.kwargs = kwargs
         self.is_running = False
-        self._lock = Lock()
+        self._lock = RLock()
         self.start()
 
     def _run(self):
